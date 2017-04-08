@@ -1,0 +1,8 @@
+package: github.com/dan-v/dosxvpn
+import:
+- package: github.com/digitalocean/godo
+  version: ^1.0.0
+- package: golang.org/x/crypto
+  subpackages:
+  - ssh
+- package: golang.org/x/oauth2
