@@ -13,5 +13,5 @@ function getParameterByName(name, url) {
 $(document).ready(function() {
     var access_token = getParameterByName('access_token');
     var state = getParameterByName('state');
-    window.location.replace("http://localhost:8080/grant?access_token=" + access_token + "&state=" + state);
+    window.location.replace("http://localhost:8999/grant?access_token=" + access_token + "&state=" + state);
 });
