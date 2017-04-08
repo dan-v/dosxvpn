@@ -23,8 +23,7 @@ $(document).ready(function() {
 
     $('.go-btn').click(function() {
         var selected = $('#region-dropdown option:selected');
-        console.log("http://localhost:8080/install/" + state + "?region=" + selected.val());
-        window.location.replace("http://localhost:8080/install/" + state + "?region=" + selected.val());
+        window.location.replace("http://localhost:8999/install/" + state + "?region=" + selected.val());
     });
 
 });
