@@ -231,11 +231,19 @@
   }
 }
 
+#ips {
+  display: none;
+}
+
 #exit {
   display: none;
 }
 
 #mobileconfig {
+  display: none;
+}
+
+#remove {
   display: none;
 }
 
@@ -250,4 +258,16 @@
   border-radius: .25rem;
   -moz-appearance: none;
   -webkit-appearance: none;
+}
+
+.login .vertical-form button[class='rem-btn'] {
+  background: #f53737;
+  width: 60%;
+}
+.login .vertical-form button:hover[class='rem-btn'] {
+  background: #ff0000;
+  width: 60%;
+}
+.login .vertical-form.sign-in p[id="initial-ip"] {
+  font-size: 14px;
 }
