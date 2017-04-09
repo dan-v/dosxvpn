@@ -1,4 +1,4 @@
-One click personal VPN server on [DigitalOcean](https://digitalocean.com) with automated OSX VPN setup. The deployed VPN server features auto upgrading of both the OS and VPN software so you don't need to worry about managing a server.
+One click personal VPN server on [DigitalOcean](https://digitalocean.com) with automated OSX setup. The deployed VPN server includes automated updates of both the OS and VPN software, so you don't need to worry about managing a server.
 
 ![](/static/overview.gif?raw=true)
 

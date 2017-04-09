@@ -13,6 +13,7 @@ $(document).ready(function() {
             }
         }
     };
+    var token = getUrlParameter('access_token');
     var state = getUrlParameter('state');
 
     $("#regions").submit(function(e){
@@ -21,9 +22,18 @@ $(document).ready(function() {
 
     $('#region-dropdown option[value="sfo2"]').attr("selected", true);
 
+    $('.advanced').click(function() {
+        $('#remove').css('display', 'block');
+    });
+
     $('.go-btn').click(function() {
         var selected = $('#region-dropdown option:selected');
         window.location.replace("http://localhost:8999/install/" + state + "?region=" + selected.val());
+    });
+
+    $('.rem-btn').click(function() {
+        var selected = $('#region-dropdown option:selected');
+        window.location.replace("http://localhost:8999/uninstall?access_token=" + token);
     });
 
 });

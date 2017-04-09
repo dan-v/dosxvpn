@@ -16,6 +16,10 @@ import (
 	"github.com/digitalocean/godo"
 	"golang.org/x/oauth2"
 	"context"
+	"sort"
+	"io/ioutil"
+	"time"
+	"log"
 )
 
 func Handler(oauthClientID, host string) http.Handler {
@@ -26,6 +30,7 @@ func Handler(oauthClientID, host string) http.Handler {
 		callbackTmpl:  template.Must(template.New("callback").Parse(callbackHTML)),
 		indexTmpl:     template.Must(template.New("index").Parse(indexPageHTML)),
 		regionTmpl:    template.Must(template.New("region").Parse(regionPageHTML)),
+		uninstallTmpl:    template.Must(template.New("region").Parse(uninstallPageHTML)),
 		installs:      make(map[string]*install),
 	}
 	mux := http.NewServeMux()
@@ -36,6 +41,7 @@ func Handler(oauthClientID, host string) http.Handler {
 	mux.HandleFunc("/region", h.region)
 	mux.HandleFunc("/install/", h.progressPage)
 	mux.HandleFunc("/status/", h.status)
+	mux.HandleFunc("/uninstall", h.uninstall)
 	mux.HandleFunc("/exit", h.exit)
 	return mux
 }
@@ -47,6 +53,7 @@ type handler struct {
 	callbackTmpl  *template.Template
 	indexTmpl     *template.Template
 	regionTmpl    *template.Template
+	uninstallTmpl *template.Template
 
 	installMu sync.Mutex
 	installs  map[string]*install
@@ -148,6 +155,41 @@ func (h *handler) region(rw http.ResponseWriter, req *http.Request) {
 	}
 }
 
+func (h *handler) uninstall(rw http.ResponseWriter, req *http.Request) {
+	token := req.FormValue("access_token")
+	if token == "" {
+		http.Error(rw, "invalid oauth2 grant", http.StatusBadRequest)
+		return
+	}
+
+	oauthClient := oauth2.NewClient(oauth2.NoContext, oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	))
+	client := godo.NewClient(oauthClient)
+
+	droplets, _, err := client.Droplets.List(context.TODO(), nil)
+
+	removedDroplets := make([]string, 0)
+	for _, droplet := range droplets {
+		if strings.Contains(droplet.Name, "dosxvpn") {
+			client.Droplets.Delete(context.TODO(), droplet.ID)
+			removedDroplets = append(removedDroplets, droplet.Name)
+		}
+	}
+	sort.Strings(removedDroplets)
+
+	tmplData := struct {
+		RemovedDroplets []string
+	}{
+		RemovedDroplets: removedDroplets,
+	}
+
+	err = h.uninstallTmpl.Execute(rw, tmplData)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "executing template: %s", err.Error())
+	}
+}
+
 func (h *handler) progressPage(rw http.ResponseWriter, req *http.Request) {
 	region := req.FormValue("region")
 	id := path.Base(req.URL.Path)
@@ -198,17 +240,33 @@ func (h *handler) exit(rw http.ResponseWriter, req *http.Request) {
 }
 
 type install struct {
-	mu          sync.Mutex
-	Status      string `json:"status"`
-	IPAddress   string `json:"ip_address"`
-	accessToken string
-	c           *Droplet
+	mu           sync.Mutex
+	Status       string `json:"status"`
+	VPNIPAddress string `json:"ip_address"`
+	InitialIP    string `json:"initial_ip"`
+	FinalIP      string `json:"final_ip"`
+	accessToken  string
+	c            *Droplet
 }
 
 func (i *install) setStatus(status string) {
 	i.mu.Lock()
 	defer i.mu.Unlock()
 	i.Status = status
+}
+
+func getPublicIp() (string, error) {
+	log.Println("Getting public IP address..")
+	resp, err := http.Get("http://checkip.amazonaws.com/")
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	buf, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes.TrimSpace(buf)), nil
 }
 
 func (i *install) init(state, region string) {
@@ -222,6 +280,11 @@ func (i *install) init(state, region string) {
 		}
 	}()
 
+	initialIP, _ := getPublicIp()
+	i.mu.Lock()
+	i.InitialIP = initialIP
+	i.mu.Unlock()
+
 	// Start deploying and create the droplet.
 	droplet, err = Deploy(i.accessToken, DropletName("dosxvpn-"+state[:6]+"-"+region), DropletRegion(region))
 	if err != nil {
@@ -229,7 +292,7 @@ func (i *install) init(state, region string) {
 	}
 
 	i.mu.Lock()
-	i.IPAddress = droplet.IPv4Address
+	i.VPNIPAddress = droplet.IPv4Address
 	i.c = droplet
 	i.Status = "waiting for ssh"
 	i.mu.Unlock()
@@ -249,6 +312,16 @@ func (i *install) init(state, region string) {
 	err = SetupVPN(vpnDetails)
 	if err != nil {
 		return
+	}
+
+	i.setStatus("waiting for ip address change")
+	for j := 0; j < 10; j++ {
+		time.Sleep(time.Second * 5)
+		newIp, err := getPublicIp()
+		if err == nil && newIp != "" && newIp != initialIP {
+			i.FinalIP = newIp
+			break
+		}
 	}
 
 	i.mu.Lock()
