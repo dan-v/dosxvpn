@@ -2,24 +2,24 @@ package dosxvpn
 
 import (
 	"bytes"
+	"context"
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/digitalocean/godo"
+	"golang.org/x/oauth2"
 	"html/template"
+	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
+	"sort"
 	"strings"
 	"sync"
-	"github.com/digitalocean/godo"
-	"golang.org/x/oauth2"
-	"context"
-	"sort"
-	"io/ioutil"
 	"time"
-	"log"
 )
 
 func Handler(oauthClientID, host string) http.Handler {
@@ -30,7 +30,7 @@ func Handler(oauthClientID, host string) http.Handler {
 		callbackTmpl:  template.Must(template.New("callback").Parse(callbackHTML)),
 		indexTmpl:     template.Must(template.New("index").Parse(indexPageHTML)),
 		regionTmpl:    template.Must(template.New("region").Parse(regionPageHTML)),
-		uninstallTmpl:    template.Must(template.New("region").Parse(uninstallPageHTML)),
+		uninstallTmpl: template.Must(template.New("region").Parse(uninstallPageHTML)),
 		installs:      make(map[string]*install),
 	}
 	mux := http.NewServeMux()
@@ -119,7 +119,7 @@ func (h *handler) grant(rw http.ResponseWriter, req *http.Request) {
 	curr.accessToken = token
 	curr.mu.Unlock()
 
-	http.Redirect(rw, req, "/region?access_token=" + token + "&state=" + state, http.StatusFound)
+	http.Redirect(rw, req, "/region?access_token="+token+"&state="+state, http.StatusFound)
 }
 
 func (h *handler) region(rw http.ResponseWriter, req *http.Request) {
