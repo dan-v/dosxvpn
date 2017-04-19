@@ -1,18 +1,18 @@
 package dosxvpn
 
 import (
+	"context"
 	"fmt"
 	"time"
-	"context"
 
 	"github.com/digitalocean/godo"
 	"golang.org/x/oauth2"
 )
 
 const (
-	dropletImage = "coreos-beta"
-	dropletName = "dosxvpn"
-	dropletSize = "512mb"
+	dropletImage  = "coreos-beta"
+	dropletName   = "dosxvpn"
+	dropletSize   = "512mb"
 	dropletRegion = "sfo2"
 )
 
@@ -45,7 +45,7 @@ type options struct {
 
 func Deploy(accessToken string, opts ...Option) (*Droplet, error) {
 	opt := options{
-		dropletName:  dropletName,
+		dropletName:   dropletName,
 		dropletRegion: dropletRegion,
 		dropletSize:   dropletSize,
 	}

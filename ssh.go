@@ -54,7 +54,7 @@ func connect(host string, keypair *sshKeyPair) (*ssh.Session, error) {
 	}
 
 	config := &ssh.ClientConfig{
-		User: "core",
+		User:            "core",
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(signer),

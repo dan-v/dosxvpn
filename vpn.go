@@ -1,13 +1,13 @@
 package dosxvpn
 
 import (
+	"bufio"
 	"fmt"
+	"io"
+	"io/ioutil"
 	"os"
 	"os/exec"
-	"io/ioutil"
-	"bufio"
 	"strings"
-	"io"
 )
 
 func GetVPNDetails(c *Droplet, region string) (string, error) {
@@ -47,7 +47,7 @@ func GetVPNDetails(c *Droplet, region string) (string, error) {
 	return output, nil
 }
 
-func SetupVPN(vpnDetails string) (error) {
+func SetupVPN(vpnDetails string) error {
 	err := ioutil.WriteFile("static/dosxvpn.mobileconfig", []byte(vpnDetails), 0644)
 	if err != nil {
 		return err
