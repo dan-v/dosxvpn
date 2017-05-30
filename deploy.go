@@ -2,6 +2,7 @@ package dosxvpn
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -87,6 +88,9 @@ func Deploy(accessToken string, opts ...Option) (*Droplet, error) {
 	sshKeys, _, err := client.Keys.List(ctx, nil)
 	if err != nil {
 		return nil, err
+	}
+	if len(sshKeys) == 0 {
+		return nil, errors.New("Need at least one SSH key uploaded to your DigitalOcean account. Go add an SSH key: https://cloud.digitalocean.com/settings/security")
 	}
 	for _, key := range sshKeys {
 		keyToAdd := godo.DropletCreateSSHKey{ID: key.ID}

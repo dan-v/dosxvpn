@@ -54,10 +54,13 @@ $(document).ready(function() {
               }
               $('#mobileconfig').css('display', 'block');
               $('#exit').css('display', 'block')
-              updateProgressBar(100);;
+              updateProgressBar(100);
           } else {
-              $('status-line').text('Install failed: ' + resp.status);
+              $('#status-line').text('Install failed: ' + resp.status);
               updateProgressBar(0);
+              $('#initial-ip').text('');
+              $('#initial-ip').wrap('<a href="/"/>Retry Installation</a>');
+              return;
           }
 
           if (resp.status != 'done') {
