@@ -7,8 +7,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/digitalocean/godo"
-	"golang.org/x/oauth2"
 	"html/template"
 	"io/ioutil"
 	"log"
@@ -20,6 +18,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/digitalocean/godo"
+	"golang.org/x/oauth2"
 )
 
 func Handler(oauthClientID, host string) http.Handler {
@@ -43,6 +44,7 @@ func Handler(oauthClientID, host string) http.Handler {
 	mux.HandleFunc("/status/", h.status)
 	mux.HandleFunc("/uninstall", h.uninstall)
 	mux.HandleFunc("/exit", h.exit)
+	mux.HandleFunc("/download", h.download)
 	return mux
 }
 
@@ -237,6 +239,14 @@ func (h *handler) status(rw http.ResponseWriter, req *http.Request) {
 
 func (h *handler) exit(rw http.ResponseWriter, req *http.Request) {
 	os.Exit(0)
+}
+
+func (h *handler) download(rw http.ResponseWriter, req *http.Request) {
+	data, err := ioutil.ReadFile("/tmp/dosxvpn.mobileconfig")
+	if err != nil {
+		log.Println(err)
+	}
+	http.ServeContent(rw, req, "dosxvpn.mobileconfig", time.Now(), bytes.NewReader(data))
 }
 
 type install struct {
