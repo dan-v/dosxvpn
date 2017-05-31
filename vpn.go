@@ -48,13 +48,13 @@ func GetVPNDetails(c *Droplet, region string) (string, error) {
 }
 
 func SetupVPN(vpnDetails string) error {
-	err := ioutil.WriteFile("static/dosxvpn.mobileconfig", []byte(vpnDetails), 0644)
+	err := ioutil.WriteFile("/tmp/dosxvpn.mobileconfig", []byte(vpnDetails), 0644)
 	if err != nil {
 		return err
 	}
 
 	cmd := "profiles"
-	args := []string{"-I", "-F", "static/dosxvpn.mobileconfig"}
+	args := []string{"-I", "-F", "/tmp/dosxvpn.mobileconfig"}
 	if err := exec.Command(cmd, args...).Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		return err

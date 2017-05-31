@@ -111,7 +111,7 @@ const progressPageHTML = `
 			<p id="status-line">Initializing droplet&hellip;</p>
 			<p id="initial-ip"></p>
 			<p id="final-ip"></p>
-			<a id="mobileconfig" type="submit" download="dosxvpn.mobileconfig" href="/static/dosxvpn.mobileconfig">Download VPN Configuration</a>
+			<a id="mobileconfig" type="submit" download="dosxvpn.mobileconfig" href="/download">Download VPN Configuration</a>
 			<a id="exit" type="submit" href="#">Exit</a>
 	  </form>
 	</body>
