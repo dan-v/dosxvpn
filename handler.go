@@ -14,7 +14,6 @@ import (
 	"net/url"
 	"os"
 	"path"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -164,21 +163,10 @@ func (h *handler) uninstall(rw http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	oauthClient := oauth2.NewClient(oauth2.NoContext, oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: token},
-	))
-	client := godo.NewClient(oauthClient)
-
-	droplets, _, err := client.Droplets.List(context.TODO(), nil)
-
-	removedDroplets := make([]string, 0)
-	for _, droplet := range droplets {
-		if strings.Contains(droplet.Name, "dosxvpn") {
-			client.Droplets.Delete(context.TODO(), droplet.ID)
-			removedDroplets = append(removedDroplets, droplet.Name)
-		}
+	removedDroplets, err := RemoveAllDroplets(token)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "executing template: %s", err.Error())
 	}
-	sort.Strings(removedDroplets)
 
 	tmplData := struct {
 		RemovedDroplets []string

@@ -4,6 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log"
+	"sort"
+	"strings"
 	"time"
 
 	"github.com/digitalocean/godo"
@@ -42,6 +45,46 @@ type options struct {
 	dropletName   string
 	dropletRegion string
 	dropletSize   string
+}
+
+func RemoveAllDroplets(token string) ([]string, error) {
+	oauthClient := oauth2.NewClient(oauth2.NoContext, oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: token},
+	))
+	client := godo.NewClient(oauthClient)
+
+	droplets, _, err := client.Droplets.List(context.TODO(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	// attempt removal of all dosxvpn droplets
+	removedDroplets := make([]string, 0)
+	for _, droplet := range droplets {
+		if strings.Contains(droplet.Name, "dosxvpn") {
+			_, err := client.Droplets.Delete(context.TODO(), droplet.ID)
+			if err != nil {
+				log.Println("Failed to remove droplet", droplet.Name, err)
+			}
+			removedDroplets = append(removedDroplets, droplet.Name)
+		}
+	}
+	sort.Strings(removedDroplets)
+
+	// attempt removal of all dosxvpn firewalls
+	firewalls, _, err := client.Firewalls.List(context.TODO(), nil)
+	if err == nil {
+		for _, firewall := range firewalls {
+			if strings.Contains(firewall.Name, "dosxvpn") {
+				_, err := client.Firewalls.Delete(context.TODO(), firewall.ID)
+				if err != nil {
+					log.Println("Failed to remove firewall", firewall.Name, err)
+				}
+			}
+		}
+	}
+
+	return removedDroplets, nil
 }
 
 func Deploy(accessToken string, opts ...Option) (*Droplet, error) {
@@ -127,5 +170,62 @@ func Deploy(accessToken string, opts ...Option) (*Droplet, error) {
 			return nil, fmt.Errorf("timeout waiting for provisioning of droplet %d", droplet.DropletID)
 		}
 	}
+
+	fwRequest := &godo.FirewallRequest{
+		Name: opt.dropletName,
+		InboundRules: []godo.InboundRule{
+			{
+				Protocol:  "tcp",
+				PortRange: "22",
+				Sources: &godo.Sources{
+					Addresses: []string{"0.0.0.0/0", "::/0"},
+				},
+			},
+			{
+				Protocol:  "udp",
+				PortRange: "500",
+				Sources: &godo.Sources{
+					Addresses: []string{"0.0.0.0/0", "::/0"},
+				},
+			},
+			{
+				Protocol:  "udp",
+				PortRange: "4500",
+				Sources: &godo.Sources{
+					Addresses: []string{"0.0.0.0/0", "::/0"},
+				},
+			},
+		},
+		OutboundRules: []godo.OutboundRule{
+			{
+				Protocol: "icmp",
+				Destinations: &godo.Destinations{
+					Addresses: []string{"0.0.0.0/0", "::/0"},
+				},
+			},
+			{
+				Protocol:  "tcp",
+				PortRange: "all",
+				Destinations: &godo.Destinations{
+					Addresses: []string{"0.0.0.0/0", "::/0"},
+				},
+			},
+			{
+				Protocol:  "udp",
+				PortRange: "all",
+				Destinations: &godo.Destinations{
+					Addresses: []string{"0.0.0.0/0", "::/0"},
+				},
+			},
+		},
+		DropletIDs: []int{d.ID},
+	}
+
+	// Setup firewall
+	_, _, err = client.Firewalls.Create(context.TODO(), fwRequest)
+	if err != nil {
+		return nil, err
+	}
+
 	return droplet, nil
 }
