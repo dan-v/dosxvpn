@@ -57,7 +57,7 @@ func SetupVPN(vpnDetails string) error {
 	args := []string{"-I", "-F", "/tmp/dosxvpn.mobileconfig"}
 	if err := exec.Command(cmd, args...).Run(); err != nil {
 		fmt.Fprintln(os.Stderr, err)
-		return err
+		return nil
 	}
 
 	exec.Command("open", "/System/Library/CoreServices/Menu Extras/VPN.menu/").Start()
