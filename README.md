@@ -21,14 +21,8 @@ The easiest way is to download a pre-built binary from the [GitHub Releases](htt
   go get github.com/dan-v/dosxvpn
   cd $GOPATH/src/github.com/dan-v/dosxvpn
   ```
-
-2. Install dependencies (using [Glide](https://github.com/Masterminds/glide) for dependency management)
-
-  ```sh
-  glide install
-  ```
   
-3. Run make to build (will need to install [platypus cli](http://www.sveinbjorn.org/platypus)). CLI and OSX app can then be found under build/osx/x86-64.
+2. Run make to build (will need to install [platypus cli](http://www.sveinbjorn.org/platypus)). CLI and OSX app can then be found under build/osx/x86-64.
 
   ```sh
   make
