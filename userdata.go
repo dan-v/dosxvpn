@@ -48,12 +48,22 @@ coreos:
 
         [Timer]
         OnCalendar=*-*-* 0/12:00:00
+    - name: dummy-interface.service
+      command: start
+      content: |
+        [Unit]
+        Description=Creates a dummy local interface
+
+        [Service]
+        User=root
+        Type=oneshot
+        ExecStart=/bin/sh -c "modprobe dummy; ip link set dummy0 up; ifconfig dummy0 1.1.1.1/32; echo 1.1.1.1         pi.hole >> /etc/hosts"
     - name: dosxvpn.service
       command: start
       content: |
         [Unit]
         Description=dosxvpn
-        After=docker.service
+        After=docker.service,dummy-interface.service
 
         [Service]
         User=core
@@ -64,8 +74,26 @@ coreos:
         ExecStartPre=-/usr/bin/docker kill dosxvpn
         ExecStartPre=-/usr/bin/docker rm dosxvpn
         ExecStartPre=/usr/bin/docker pull dosxvpn/strongswan
-        ExecStart=/usr/bin/docker run --name dosxvpn --privileged -p 500:500/udp -p 4500:4500/udp -v ipsec.d:/etc/ipsec.d -v strongswan.d:/etc/strongswan.d -v /lib/modules:/lib/modules -v /etc/localtime:/etc/localtime -e VPN_DOMAIN=$public_ipv4 dosxvpn/strongswan
+        ExecStart=/usr/bin/docker run --name dosxvpn --privileged --net=host -v ipsec.d:/etc/ipsec.d -v strongswan.d:/etc/strongswan.d -v /lib/modules:/lib/modules -v /etc/localtime:/etc/localtime -e VPN_DNS=1.1.1.1 -e VPN_DOMAIN=$public_ipv4 dosxvpn/strongswan
         ExecStop=/usr/bin/docker stop dosxvpn
+    - name: pihole.service
+      command: start
+      content: |
+        [Unit]
+        Description=pihole
+        After=docker.service,dummy-interface.service
+
+        [Service]
+        User=core
+        Restart=always
+        TimeoutStartSec=0
+        KillMode=none
+        EnvironmentFile=/etc/environment
+        ExecStartPre=-/usr/bin/docker kill pihole
+        ExecStartPre=-/usr/bin/docker rm pihole
+        ExecStartPre=/usr/bin/docker pull diginc/pi-hole:alpine
+        ExecStart=/usr/bin/docker run --name pihole --net=host -e ServerIP=1.1.1.1 -e WEBPASSWORD=dosxvpn diginc/pi-hole:alpine
+        ExecStop=/usr/bin/docker stop pihole
 `
 
 type userDataParams struct {
