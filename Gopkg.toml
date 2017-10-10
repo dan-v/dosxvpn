@@ -23,7 +23,11 @@
 
 [[constraint]]
   name = "github.com/digitalocean/godo"
-  version = "1.0.0"
+  version = "1.1.1"
+
+[[constraint]]
+  branch = "master"
+  name = "github.com/spf13/cobra"
 
 [[constraint]]
   branch = "master"
