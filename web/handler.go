@@ -132,7 +132,7 @@ func (h *handler) delete(rw http.ResponseWriter, req *http.Request) {
 		rw.Write([]byte("Need to specify droplet"))
 		return
 	}
-	_, err := deploy.RemoveVPN(h.token, droplet)
+	_, err := deploy.RemoveVPN(h.token, droplet, true)
 	if err != nil {
 		rw.Write([]byte(fmt.Sprintf("Failed to remove VPN: %v", err)))
 		return
