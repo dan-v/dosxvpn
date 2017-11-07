@@ -1,7 +1,6 @@
 package genconfig
 
-const androidConfigTemplate = `
-{
+const androidConfigTemplate = `{
     "uuid": "{{.UUID}}",
     "name": "{{.Name}}",
     "type": "ikev2-cert",
@@ -13,7 +12,7 @@ const androidConfigTemplate = `
 		"block-ipv6": true
     },
     "local": {
-        "id": "client@{{.IP}}",
+        "id": "{{.IP}}",
         "p12": "{{.PrivateKey}}"
     },
     "mtu": 1280
