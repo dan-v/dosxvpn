@@ -56,18 +56,6 @@ func (c *Client) WaitForDropletIP(dropletID int) (ip string, err error) {
 	return ip, nil
 }
 
-func (c *Client) CreateSSHKey(name, publicKey string) (id int, err error) {
-	createRequest := &godo.KeyCreateRequest{
-		Name:      "dosxvpn",
-		PublicKey: publicKey,
-	}
-	key, _, err := c.doClient.Keys.Create(context.TODO(), createRequest)
-	if err != nil {
-		return 0, err
-	}
-	return key.ID, nil
-}
-
 func (c *Client) CreateDroplet(name, region, size, userData, image string) (id int, err error) {
 	createRequest := &godo.DropletCreateRequest{
 		Name:     name,
@@ -77,13 +65,9 @@ func (c *Client) CreateDroplet(name, region, size, userData, image string) (id i
 		Image: godo.DropletCreateImage{
 			Slug: image,
 		},
-		IPv6: true,
 	}
 
-	accountSSHKeys, err := c.GetAccountSSHKeys()
-	if err != nil {
-		return 0, err
-	}
+	accountSSHKeys, err := c.getAccountSSHKeys()
 	for _, key := range accountSSHKeys {
 		keyToAdd := godo.DropletCreateSSHKey{ID: key.ID}
 		createRequest.SSHKeys = append(createRequest.SSHKeys, keyToAdd)
@@ -154,7 +138,8 @@ func (c *Client) DeleteFirewall(firewallID string) error {
 	return nil
 }
 
-func (c *Client) GetAccountSSHKeys() ([]godo.Key, error) {
+func (c *Client) getAccountSSHKeys() ([]godo.Key, error) {
+	// Query all the SSH keys on the account so we can include them in the droplet.
 	keys, _, err := c.doClient.Keys.List(context.TODO(), nil)
 	if err != nil {
 		return nil, err
@@ -164,12 +149,6 @@ func (c *Client) GetAccountSSHKeys() ([]godo.Key, error) {
 
 func (c *Client) generateInboundFirewallRules() []godo.InboundRule {
 	return []godo.InboundRule{
-		{
-			Protocol: "icmp",
-			Sources: &godo.Sources{
-				Addresses: []string{"0.0.0.0/0", "::/0"},
-			},
-		},
 		{
 			Protocol:  "tcp",
 			PortRange: "22",

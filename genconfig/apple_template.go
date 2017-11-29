@@ -1,6 +1,7 @@
 package genconfig
 
-const mobileConfigTemplate = `<?xml version="1.0" encoding="UTF-8"?>
+const mobileConfigTemplate = `
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
@@ -64,14 +65,14 @@ const mobileConfigTemplate = `<?xml version="1.0" encoding="UTF-8"?>
     <string>Certificate</string>
     <key>ChildSecurityAssociationParameters</key>
     <dict>
-    <key>DiffieHellmanGroup</key>
-        <integer>19</integer>
+        <key>DiffieHellmanGroup</key>
+        <integer>2</integer>
         <key>EncryptionAlgorithm</key>
-        <string>AES-128-GCM</string>
+        <string>3DES</string>
         <key>IntegrityAlgorithm</key>
-        <string>SHA2-512</string>
+        <string>SHA1-96</string>
         <key>LifeTimeInMinutes</key>
-        <integer>20</integer>
+        <integer>1440</integer>
     </dict>
     <key>DeadPeerDetectionRate</key>
     <string>Medium</string>
@@ -86,22 +87,18 @@ const mobileConfigTemplate = `<?xml version="1.0" encoding="UTF-8"?>
     <key>IKESecurityAssociationParameters</key>
     <dict>
         <key>DiffieHellmanGroup</key>
-        <integer>19</integer>
+        <integer>2</integer>
         <key>EncryptionAlgorithm</key>
-        <string>AES-128-GCM</string>
+        <string>3DES</string>
         <key>IntegrityAlgorithm</key>
-        <string>SHA2-512</string>
+        <string>SHA1-96</string>
         <key>LifeTimeInMinutes</key>
-        <integer>20</integer>
+        <integer>1440</integer>
     </dict>
     <key>LocalIdentifier</key>
-    <string>{{.IP}}</string>
+    <string>client@{{.IP}}</string>
     <key>PayloadCertificateUUID</key>
     <string>{{.UUID1}}</string>
-    <key>CertificateType</key>
-    <string>ECDSA256</string>
-    <key>ServerCertificateIssuerCommonName</key>
-    <string>{{.IP}}</string>
     <key>RemoteAddress</key>
     <string>{{.IP}}</string>
     <key>RemoteIdentifier</key>

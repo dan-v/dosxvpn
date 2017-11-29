@@ -34,10 +34,6 @@ func New() (*Client, error) {
 	return ssh, nil
 }
 
-func (s *Client) GetPublicKey() string {
-	return string(ssh.MarshalAuthorizedKey(s.KeyPair.PublicKey))
-}
-
 func (s *Client) openSession(user, host string) (*ssh.Session, error) {
 	signer, err := ssh.NewSignerFromKey(s.KeyPair.PrivateKey)
 	if err != nil {

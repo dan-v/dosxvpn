@@ -9,7 +9,6 @@ import (
 )
 
 var name string
-var removeProfile bool
 
 var rmCmd = &cobra.Command{
 	Use:   "rm",
@@ -24,7 +23,7 @@ var rmCmd = &cobra.Command{
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		_, err := deploy.RemoveVPN(getCliToken(), name, removeProfile)
+		_, err := deploy.RemoveVPN(getCliToken(), name)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -35,5 +34,4 @@ var rmCmd = &cobra.Command{
 func init() {
 	RootCmd.AddCommand(rmCmd)
 	rmCmd.Flags().StringVar(&name, "name", "", "Name of droplet to remove")
-	rmCmd.Flags().BoolVar(&removeProfile, "remove-profile", false, "Remove VPN profile as well (only for OSX).")
 }

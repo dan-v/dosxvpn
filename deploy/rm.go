@@ -8,7 +8,7 @@ import (
 	"github.com/dan-v/dosxvpn/vpn"
 )
 
-func RemoveVPN(token, name string, removeProfile bool) ([]string, error) {
+func RemoveVPN(token, name string) ([]string, error) {
 	log.Printf("Listing droplets..")
 	client := doclient.New(token)
 	droplets, err := client.ListDroplets()
@@ -41,14 +41,12 @@ func RemoveVPN(token, name string, removeProfile bool) ([]string, error) {
 		}
 	}
 
-	if removeProfile {
-		log.Printf("Removing OSX VPN profile for %s", name)
-		err = vpn.OSXRemoveVPN(name)
-		if err != nil {
-			log.Printf("Failed to remove OSX VPN profile for %s. %v", name, err)
-		}
-		log.Printf("Finished removing OSX VPN profile for %s", name)
+	log.Printf("Removing OSX VPN profile for %s", name)
+	err = vpn.OSXRemoveVPN(name)
+	if err != nil {
+		log.Printf("Failed to remove OSX VPN profile for %s. %v", name, err)
 	}
+	log.Printf("Finished removing OSX VPN profile for %s", name)
 
 	return removedDroplets, nil
 }

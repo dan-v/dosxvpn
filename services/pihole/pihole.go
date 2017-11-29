@@ -4,16 +4,6 @@ type Service struct{}
 
 func (s Service) UserData() string {
 	return `
-    - name: pihole-etc-host.service
-      command: start
-      content: |
-        [Unit]
-        Description=pihole /etc/hosts entry
-
-        [Service]
-        User=root
-        Type=oneshot
-        ExecStart=/bin/sh -c "echo 1.1.1.1         pi.hole >> /etc/hosts"
     - name: pihole.service
       command: start
       content: |
