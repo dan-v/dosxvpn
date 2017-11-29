@@ -36,8 +36,8 @@ func (s Service) UserData() string {
         EnvironmentFile=/etc/environment
         ExecStartPre=-/usr/bin/docker kill dosxvpn
         ExecStartPre=-/usr/bin/docker rm dosxvpn
-        ExecStartPre=/usr/bin/docker pull dosxvpn/strongswan
-        ExecStart=/usr/bin/docker run --name dosxvpn --privileged --net=host -v ipsec.d:/etc/ipsec.d -v strongswan.d:/etc/strongswan.d -v /lib/modules:/lib/modules -v /etc/localtime:/etc/localtime -e VPN_DNS=1.1.1.1 -e VPN_DOMAIN=$public_ipv4 dosxvpn/strongswan
+        ExecStartPre=/usr/bin/docker pull dosxvpn/strongswan:legacy
+        ExecStart=/usr/bin/docker run --name dosxvpn --privileged --net=host -v ipsec.d:/etc/ipsec.d -v strongswan.d:/etc/strongswan.d -v /lib/modules:/lib/modules -v /etc/localtime:/etc/localtime -e VPN_DNS=1.1.1.1 -e VPN_DOMAIN=$public_ipv4 dosxvpn/strongswan:legacy
         ExecStop=/usr/bin/docker stop dosxvpn
 `
 }
