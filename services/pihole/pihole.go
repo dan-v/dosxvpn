@@ -9,6 +9,7 @@ func (s Service) UserData() string {
       content: |
         [Unit]
         Description=pihole /etc/hosts entry
+        ConditionFirstBoot=true
 
         [Service]
         User=root
