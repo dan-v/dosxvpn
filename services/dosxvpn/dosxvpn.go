@@ -6,6 +6,7 @@ func (s Service) UserData() string {
 	return `
     - name: dosxvpn-sysctl.service
       enable: true
+      command: start
       content: |
         [Unit]
         Description=Handles settings for sysctl
@@ -14,6 +15,8 @@ func (s Service) UserData() string {
         Type=oneshot
         User=root
         ExecStartPre=/usr/sbin/sysctl -w net.ipv4.ip_forward=1
+        ExecStartPre=/usr/sbin/sysctl -w net.ipv4.conf.all.forwarding=1
+        ExecStartPre=/usr/sbin/sysctl -w net.ipv6.conf.all.forwarding=1
         ExecStartPre=/usr/sbin/sysctl -w net.ipv4.conf.all.accept_source_route=0
         ExecStartPre=/usr/sbin/sysctl -w net.ipv4.conf.default.accept_source_route=0
         ExecStartPre=/usr/sbin/sysctl -w net.ipv4.conf.all.accept_redirects=0
@@ -24,7 +27,10 @@ func (s Service) UserData() string {
         ExecStartPre=/usr/sbin/sysctl -w net.ipv4.conf.all.rp_filter=1
         ExecStartPre=/usr/sbin/sysctl -w net.ipv4.conf.default.rp_filter=1
         ExecStartPre=/usr/sbin/sysctl -w net.ipv4.conf.all.send_redirects=0
-        ExecStart=-/usr/bin/echo echo 1 > /proc/sys/net/ipv4/route/flush
+        ExecStartPre=/usr/sbin/sysctl -w net.ipv4.conf.all.send_redirects=0
+        ExecStartPre=/usr/bin/echo 1 > /proc/sys/net/ipv4/route/flush
+        ExecStartPre=/usr/bin/echo 1 > /proc/sys/net/ipv6/route/flush
+        ExecStart=/usr/bin/echo
     - name: dosxvpn-update.service
       content: |
         [Unit]
@@ -35,6 +41,7 @@ func (s Service) UserData() string {
         ExecStartPre=/usr/bin/docker pull dosxvpn/strongswan-updater
         ExecStart=/usr/bin/docker run --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock dosxvpn/strongswan-updater
     - name: dosxvpn-update.timer
+      enable: true
       command: start
       content: |
         [Unit]
