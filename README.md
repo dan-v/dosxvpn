@@ -51,7 +51,9 @@
 ## FAQ
 1. <b>Should I use dosxvpn?</b> That's up to you. Use at your own risk.
 2. <b>Why is this better than using public VPN provider XYZ?</b> While most VPN providers will provide a secure connection to their endpoints, you may not be interested in putting blind faith in their claims that they will not log or track your activity online.
-3. <b>How is this different than [algo](https://github.com/trailofbits/algo)?</b> 1) Installallation - is simple and has no additional system dependencies. 2) Updates: dosxvpn handles updates of both the OS and VPN. This means any critical security updates or bug fixes will automatically be applied for you.
+3. <b>How is this different than [algo](https://github.com/trailofbits/algo)?</b>  
+   1) Installation - is simple and has no additional system dependencies.  
+   2) Updates: dosxvpn handles updates of both the OS and VPN. This means any critical security updates or bug fixes will automatically be applied for you.
 4. <b>How much does this cost?</b> This launches a 512MB DigitalOcean droplet that costs $5/month currently.
 5. <b>What is the bandwidth limit?</b> The 512MB DigitalOcean droplet has a 1TB bandwidth limit. This does not appear to be strictly enforced.
 6. <b>Where does dosxvpn store VPN configuration files?</b> You can find all deployed VPN configuration files in your ~/.dosxvpn directory.
