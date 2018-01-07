@@ -30,7 +30,7 @@ func (s Service) UserData() string {
         EnvironmentFile=/etc/environment
         ExecStartPre=-/usr/bin/docker kill pihole
         ExecStartPre=-/usr/bin/docker rm pihole
-        ExecStartPre=/usr/bin/docker pull diginc/pi-hole:alpine
-        ExecStart=/usr/bin/docker run --name pihole --net=host -e ServerIP=1.1.1.1 -e WEBPASSWORD=dosxvpn diginc/pi-hole:alpine
+        ExecStartPre=/usr/bin/docker pull diginc/pi-hole:latest
+        ExecStart=/usr/bin/docker run --name pihole --net=host -e ServerIP=1.1.1.1 -e WEBPASSWORD=dosxvpn diginc/pi-hole:latest
         ExecStop=/usr/bin/docker stop pihole`
 }
