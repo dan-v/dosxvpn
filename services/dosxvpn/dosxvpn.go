@@ -38,8 +38,8 @@ func (s Service) UserData() string {
 
         [Service]
         Type=oneshot
-        ExecStartPre=/usr/bin/docker pull dosxvpn/strongswan-updater
-        ExecStart=/usr/bin/docker run --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock dosxvpn/strongswan-updater
+        ExecStartPre=/usr/bin/docker pull dosxvpn/updater:latest
+        ExecStart=/usr/bin/docker run --rm --privileged -v /var/run/docker.sock:/var/run/docker.sock dosxvpn/updater:latest
     - name: dosxvpn-update.timer
       enable: true
       command: start
@@ -64,8 +64,8 @@ func (s Service) UserData() string {
         EnvironmentFile=/etc/environment
         ExecStartPre=-/usr/bin/docker kill dosxvpn
         ExecStartPre=-/usr/bin/docker rm dosxvpn
-        ExecStartPre=/usr/bin/docker pull dosxvpn/strongswan
-        ExecStart=/usr/bin/docker run --name dosxvpn --privileged --net=host -v ipsec.d:/etc/ipsec.d -v strongswan.d:/etc/strongswan.d -v /lib/modules:/lib/modules -v /etc/localtime:/etc/localtime -e VPN_DOMAIN=$public_ipv4 dosxvpn/strongswan
+        ExecStartPre=/usr/bin/docker pull dosxvpn/strongswan:latest
+        ExecStart=/usr/bin/docker run --name dosxvpn --privileged --net=host -v ipsec.d:/etc/ipsec.d -v strongswan.d:/etc/strongswan.d -v /lib/modules:/lib/modules -v /etc/localtime:/etc/localtime -e VPN_DOMAIN=$public_ipv4 dosxvpn/strongswan:latest
         ExecStop=/usr/bin/docker stop dosxvpn
 `
 }
