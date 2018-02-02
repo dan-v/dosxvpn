@@ -20,6 +20,7 @@ import (
 	"github.com/dan-v/dosxvpn/services"
 	"github.com/dan-v/dosxvpn/services/coreos"
 	"github.com/dan-v/dosxvpn/services/dosxvpn"
+	"github.com/dan-v/dosxvpn/services/nextcloud"
 	"github.com/dan-v/dosxvpn/services/pihole"
 	"github.com/dan-v/dosxvpn/sshclient"
 	"github.com/dan-v/dosxvpn/vpn"
@@ -72,7 +73,7 @@ func New(token, region string, autoConfigure bool) (*Deployment, error) {
 		AutoConfigure: autoConfigure,
 		doClient:      doclient.New(token),
 		services: []services.Service{
-			&coreos.Service{}, &dosxvpn.Service{}, &pihole.Service{},
+			&coreos.Service{}, &dosxvpn.Service{}, &pihole.Service{}, &nextcloud.Service{},
 		},
 		Status: "pending auth",
 	}

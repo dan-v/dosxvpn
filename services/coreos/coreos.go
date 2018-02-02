@@ -111,6 +111,10 @@ coreos:
         [Service]
         User=root
         Type=oneshot
-        ExecStart=/bin/sh -c "modprobe dummy; ip link set dummy0 up; ifconfig dummy0 1.1.1.1/32"
+        ExecStartPre=/bin/sh -c "modprobe dummy"
+        ExecStartPre=-/bin/sh -c "ip link add dummy0 type dummy"
+        ExecStartPre=/bin/sh -c "ip link set dummy0 up"
+        ExecStartPre=-/bin/sh -c "ifconfig dummy0 inet6 add 2001:db8:1:1::1/64"
+        ExecStart=/bin/sh -c "ifconfig dummy0 1.1.1.1/32"
 `
 }
