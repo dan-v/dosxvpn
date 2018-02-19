@@ -41,8 +41,11 @@ write_files:
       -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 10 --rttl --name SSH -j DROP
       -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
       -A INPUT -p udp -m multiport --dports 500,4500 -j ACCEPT
-      -A INPUT -d 1.1.1.1 -p udp -j ACCEPT
-      -A INPUT -d 1.1.1.1 -p tcp -j ACCEPT
+      -A INPUT -p tcp --destination-port 443 -j REJECT --reject-with tcp-reset
+      -A INPUT -p udp --destination-port 80 -j REJECT --reject-with icmp-port-unreachable
+      -A INPUT -p udp --destination-port 443 -j REJECT --reject-with icmp-port-unreachable
+      -A INPUT -d 1.1.1.2 -p udp -j ACCEPT
+      -A INPUT -d 1.1.1.2 -p tcp -j ACCEPT
       -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
       -A FORWARD -m conntrack --ctstate NEW -s 192.168.99.0/24 -m policy --pol ipsec --dir in -j ACCEPT
       COMMIT
@@ -74,6 +77,9 @@ write_files:
       -A INPUT -p tcp --dport 22 -m state --state NEW -m recent --update --seconds 60 --hitcount 10 --rttl --name SSH -j DROP
       -A INPUT -p tcp --dport 22 -m state --state NEW -j ACCEPT
       -A INPUT -p udp -m multiport --dports 500,4500 -j ACCEPT
+      -A INPUT -p tcp --destination-port 443 -j REJECT --reject-with tcp-reset
+      -A INPUT -p udp --destination-port 80 -j REJECT --reject-with icmp6-port-unreachable
+      -A INPUT -p udp --destination-port 443 -j REJECT --reject-with icmp6-port-unreachable
       -A INPUT -d fd9d:bc11:4020::/48 -p udp -j ACCEPT
       -A INPUT -d fd9d:bc11:4020::/48 -p tcp -j ACCEPT
       -A FORWARD -j ICMPV6-CHECK
@@ -94,8 +100,6 @@ coreos:
     window-start: 10:00
     window-length: 1h
   units:
-    - name: etcd2.service
-      command: start
     - name: iptables-restore.service
       enable: true
       command: start
@@ -104,6 +108,7 @@ coreos:
       command: start
     - name: dummy-interface.service
       command: start
+      enable: true
       content: |
         [Unit]
         Description=Creates a dummy local interface
@@ -114,7 +119,10 @@ coreos:
         ExecStartPre=/bin/sh -c "modprobe dummy"
         ExecStartPre=-/bin/sh -c "ip link add dummy0 type dummy"
         ExecStartPre=/bin/sh -c "ip link set dummy0 up"
-        ExecStartPre=-/bin/sh -c "ifconfig dummy0 inet6 add 2001:db8:1:1::1/64"
-        ExecStart=/bin/sh -c "ifconfig dummy0 1.1.1.1/32"
+        ExecStartPre=-/bin/sh -c "ifconfig dummy0 inet6 add fd9d:bc11:4020::/48"
+        ExecStartPre=-/bin/sh -c "ifconfig dummy0 1.1.1.2/32"
+        ExecStartPre=-/bin/sh -c "ifconfig dummy0 inet6 add fd9d:bc11:4020::/48"
+        ExecStartPre=-/bin/sh -c "ifconfig dummy0 1.1.1.2/32"
+        ExecStart=/bin/sh -c "echo"
 `
 }

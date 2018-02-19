@@ -16,11 +16,11 @@
 * Dual stack IPv4/IPv6 enabled.
 
 ## Web Installer (OSX) 
-1. Download the latest pre-built app from the [GitHub Releases](https://github.com/dan-v/dosxvpn/releases) page. <b>Note: if you are on OSX version 10.11 or below - you'll need to use the legacy release version.</b>
+1. Download the latest pre-built app from the [GitHub Releases](https://github.com/dan-v/dosxvpn/releases) page. <b>Note: only OSX 10.12+ is supported.</b>
 2. Open the app and run through the web based installation wizard to setup a new VPN.
 
 ## CLI Usage (OSX)
-1. Download the latest pre-built cli from the [GitHub Releases](https://github.com/dan-v/dosxvpn/releases) page. <b>Note: if you are on OSX version 10.11 or below - you'll need to use the legacy release version.</b>
+1. Download the latest pre-built cli from the [GitHub Releases](https://github.com/dan-v/dosxvpn/releases) page. <b>Note: only OSX 10.12+ is supported.</b>
 2. Make the binary executable
   ```sh
   chmod +x dosxvpn
