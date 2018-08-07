@@ -22,6 +22,14 @@ write_files:
     permissions: 0644
     owner: root:root
     content: |
+      *mangle
+      :PREROUTING ACCEPT [0:0]
+      :INPUT ACCEPT [0:0]
+      :FORWARD ACCEPT [0:0]
+      :OUTPUT ACCEPT [0:0]
+      :POSTROUTING ACCEPT [0:0]
+      -A FORWARD -s 192.168.99.0/24 -o eth0 -p tcp -m tcp --tcp-flags SYN,RST SYN -m tcpmss --mss 1361:1536 -j TCPMSS --set-mss 1360
+      COMMIT
       *nat
       :PREROUTING ACCEPT [0:0]
       :POSTROUTING ACCEPT [0:0]
