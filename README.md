@@ -1,6 +1,6 @@
 <h1 align="center">dosxvpn</h1>
 
-<h4 align="center">Easily deploy your own personal VPN server with DNS adblocking running on <a href="https://digitalocean.com)" target="_blank">DigitalOcean</a>.</h4>
+<h4 align="center">Easily deploy your own personal VPN server with DNS adblocking running on <a href="https://digitalocean.com" target="_blank">DigitalOcean</a>.</h4>
 
 ---
 
